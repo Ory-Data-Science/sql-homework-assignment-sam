@@ -1,0 +1,128 @@
+Exercise 1
+
+CREATE VIEW all_survey_data AS
+SELECT *
+FROM surveys;
+
+
+CREATE VIEW size_differences_among_sexes_data AS
+SELECT species_id, sex, hindfoot_length, weight
+FROM surveys;
+
+Exercise 2
+
+CREATE VIEW spectabilis_population_data AS
+SELECT month, day, year, sex
+FROM surveys
+WHERE species_id = 'DS';
+
+CREATE VIEW spectabilis_population_data_males AS
+SELECT month, day, year
+FROM surveys
+WHERE sex = 'M' and species_id = 'DS';
+
+CREATE VIEW spectabilis_population_data_females AS
+SELECT month, day, year
+FROM surveys
+WHERE sex = 'F' and species_id = 'DS';
+
+Exercise 3
+
+CREATE VIEW '100_largest_individuals' AS
+SELECT species_id, year, weight
+FROM surveys
+ORDER BY weight DESC, hindfoot_length DESC, year DESC
+LIMIT 100;	
+
+Exercise 4
+
+CREATE VIEW dates_sampled AS
+SELECT DISTINCT year, month, day
+FROM surveys;
+
+Exercise 5
+
+CREATE VIEW no_missing_data AS
+SELECT year, month, day, species_id, weight
+FROM surveys
+WHERE year IS NOT NULL AND month IS NOT NULL AND day IS NOT NULL AND species_id IS NOT NULL AND weight IS NOT NULL;
+
+Exercise 6
+
+CREATE VIEW dates_with_dipodomys_spectabilis AS
+SELECT DISTINCT year, month, day
+FROM surveys
+WHERE species_id = 'DS'
+ORDER BY year, month, day;
+
+Exercise 7
+
+CREATE VIEW total_abundance_by_year AS
+SELECT year, COUNT(*) AS total_abundance
+FROM surveys
+WHERE species_id IS NOT NULL
+GROUP BY year;
+
+Exercise 8
+
+CREATE VIEW mass_abundance_data AS
+SELECT species_id, year, COUNT(*) AS total_abundance, SUM(weight/1000.0) AS total_biomass_kg
+FROM surveys
+WHERE species_id IS NOT NULL
+GROUP BY species_id, year
+ORDER BY year, species_id
+
+Exercise 9
+
+CREATE VIEW species_captures_by_data AS
+SELECT surveys.year, surveys.month, surveys.day, species. genus, species.species
+FROM surveys
+JOIN species
+ON surveys.species_id = species.species_id;
+
+Exercise 10
+
+CREATE VIEW species_plot_data AS
+SELECT surveys.year, surveys.month, surveys.day, species.genus, species.species, plots.plot_id, plots.plot_type
+FROM surveys
+JOIN species
+ON surveys.species_id = species.species_id
+JOIN plots 
+ON surveys.plot_id =  plots.plot_id;
+
+Exercise 11
+
+CREATE VIEW non_rodents_on_controls AS
+SELECT DISTINCT species.genus, species.species, species.taxa
+FROM surveys
+JOIN species
+ON surveys.species_id = species.species_id
+JOIN plots
+ON surveys.plot_id = plots.plot_id
+WHERE (species.taxa != 'Rodent') AND (plots.plot_type = 'Control');
+
+Exercise 12
+
+CREATE VIEW size_comparison_controls_vs_krat_exclosures AS
+SELECT surveys.year, species.genus, species.species, surveys.weight, plots.plot_type
+FROM surveys
+JOIN species
+ON surveys.species_id = species.species_id
+JOIN plots
+ON surveys.plot_id = plots.plot_id
+WHERE (species.taxa = 'Rodent') AND (species.species != 'sp.') AND (weight IS NOT NULL) 
+AND (plots.plot_type IN ('Control', 'Long-term Krat Exclosure'));
+
+Exercise 13
+
+CREATE VIEW individuals_per_plot_type AS
+SELECT plot_type, COUNT(*) AS individuals_sampled
+FROM surveys
+JOIN species
+ON surveys.species_id = species.species_id
+JOIN plots
+ON surveys.plot_id = plots.plot_id
+WHERE species.taxa = 'Rodent'
+GROUP BY plot_type;
+
+
